@@ -1,4 +1,4 @@
-# app.py
+# app.py (Versão FINAL com Setup de Emergência)
 
 import os
 from flask import Flask
@@ -6,6 +6,8 @@ from flask_login import current_user
 from config import Config
 from extensions import db, login_manager
 from models import Notificacao, User
+# Importar a função de inicialização (que está em create_admin.py)
+from create_admin import initialize_database
 from routes import main as main_blueprint
 
 
@@ -17,17 +19,26 @@ def create_app(config_class=Config):
     db.init_app(app)
     login_manager.init_app(app)
 
-    # 2. Configura o User Loader (Proteção contra OperationalError)
+    # 2. Configura o User Loader
     @login_manager.user_loader
     def load_user(user_id):
         with app.app_context():
             return User.query.get(int(user_id))
 
-    # 3. CRIAÇÃO OBRIGATÓRIA DA TABELA
+    # 3. CRIAÇÃO E VERIFICAÇÃO DO DB NO CONTEXTO (SOLUÇÃO DE EMERGÊNCIA)
     with app.app_context():
+        # Cria as tabelas se não existirem
         db.create_all()
 
-        # 4. Cria a pasta para os QR Codes
+        # Se não houver usuários (primeira execução), inicializa os dados
+        if User.query.count() == 0:
+            print("=== EXECUTANDO SETUP INICIAL DE DADOS (RENDER FREE TIER) ===")
+            # Chama a função de inicialização que cria o Admin e Locais
+            # A lógica completa está agora aqui, mas isolada.
+            initialize_database()
+            print("=== SETUP INICIAL COMPLETO. O Admin foi criado. ===")
+
+    # 4. Cria a pasta para os QR Codes
     os.makedirs(app.config['QR_CODE_FOLDER'], exist_ok=True)
 
     # 5. Registro dos Blueprints
