@@ -14,6 +14,5 @@ class Config:
                               'sqlite:///' + os.path.join(basedir, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    # Manter a pasta de QR Codes, embora a geração de imagens não seja mais usada
     QR_CODE_FOLDER = os.path.join(basedir, 'static/qrcodes')
     ESTOQUE_PADRAO_ID = 1

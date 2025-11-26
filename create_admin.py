@@ -9,28 +9,21 @@ import sys
 def initialize_database():
     """Cria o Admin e Locais Iniciais. Chamado apenas se o DB estiver vazio."""
 
-    # NOTA: O app_context já foi criado no app.py antes de chamar esta função.
+    # Este código será chamado dentro do app_context, no app.py
 
     print("--- Inicializando Dados ---")
 
     # 1. Criação do Usuário Admin Padrão
-    # OBS: O código de deleção forçada foi removido, pois o if User.query.count() == 0
-    # no app.py já garante que esta função só rode na primeira vez.
-
     admin_user = User(username='admin', is_admin=True)
-    admin_user.set_password('SUA_NOVA_SENHA_FORTE')  # <<<< USE A SENHA QUE VOCÊ DEFINIU!
+    admin_user.set_password('SUA_NOVA_SENHA_FORTE')  # <<< DEFINA SUA SENHA!
     db.session.add(admin_user)
 
-    # 2. Limpeza e Criação dos Locais (Recriação para garantir ID 1)
-    # ATENÇÃO: As tabelas já foram criadas pelo db.create_all() no app.py
-    # O código abaixo DEVE ser capaz de rodar sem User.query.count()
-
-    # Limpamos apenas para o caso de ter sobrado lixo (embora o User.query.count()==0 já seja a checagem)
-    # db.session.query(Sala).delete()
-    # db.session.query(Predio).delete()
-    # db.session.commit()
-
-    print("Criando locais...")
+    # 2. Limpeza e Criação dos Locais (Garantindo ID 1)
+    # Limpamos apenas para garantir um estado limpo.
+    db.session.query(Sala).delete()
+    db.session.query(Predio).delete()
+    db.session.commit()
+    print("Locais antigos limpos. Recriando locais...")
 
     # 3. Criação dos Locais Iniciais
     locais_iniciais = [
@@ -54,5 +47,6 @@ def initialize_database():
 
     db.session.commit()
     print("Sucesso: Locais iniciais criados.")
+    print("Sucesso: Usuário Admin criado.")
 
-# O bloco if __name__ == '__main__': foi removido para evitar a execução duplicada.
+# O bloco if __name__ == '__main__': é removido para que o app.py possa importar.

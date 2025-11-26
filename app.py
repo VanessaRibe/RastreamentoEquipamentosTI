@@ -1,4 +1,4 @@
-# app.py (Versão FINAL com Setup de Emergência)
+# app.py
 
 import os
 from flask import Flask
@@ -6,8 +6,7 @@ from flask_login import current_user
 from config import Config
 from extensions import db, login_manager
 from models import Notificacao, User
-# Importar a função de inicialização (que está em create_admin.py)
-from create_admin import initialize_database
+from create_admin import initialize_database  # Importa a função de inicialização
 from routes import main as main_blueprint
 
 
@@ -27,16 +26,13 @@ def create_app(config_class=Config):
 
     # 3. CRIAÇÃO E VERIFICAÇÃO DO DB NO CONTEXTO (SOLUÇÃO DE EMERGÊNCIA)
     with app.app_context():
-        # Cria as tabelas se não existirem
         db.create_all()
 
-        # Se não houver usuários (primeira execução), inicializa os dados
+        # Se não houver usuários (primeira execução/deploy), inicializa os dados
         if User.query.count() == 0:
-            print("=== EXECUTANDO SETUP INICIAL DE DADOS (RENDER FREE TIER) ===")
-            # Chama a função de inicialização que cria o Admin e Locais
-            # A lógica completa está agora aqui, mas isolada.
+            print("=== EXECUTANDO SETUP INICIAL DE DADOS AUTOMATICAMENTE ===")
             initialize_database()
-            print("=== SETUP INICIAL COMPLETO. O Admin foi criado. ===")
+            print("=== SETUP INICIAL COMPLETO. ===")
 
     # 4. Cria a pasta para os QR Codes
     os.makedirs(app.config['QR_CODE_FOLDER'], exist_ok=True)
@@ -61,3 +57,8 @@ def create_app(config_class=Config):
 if __name__ == '__main__':
     app = create_app()
     app.run(debug=True)
+
+
+# Função auxiliar que o Gunicorn espera
+def app():
+    return create_app()
