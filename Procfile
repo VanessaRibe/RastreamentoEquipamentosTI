@@ -1,2 +1,2 @@
-# Procfile (CORRIGIDO PARA CHAMAR O SERVIDOR)
+# Procfile (VERSÃO FINAL)
 web: gunicorn app:create_app\(\)
